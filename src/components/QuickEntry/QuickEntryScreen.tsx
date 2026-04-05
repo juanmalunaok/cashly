@@ -50,7 +50,7 @@ export default function QuickEntryScreen() {
 
   const monthLabel = `${getMonthName(now.getMonth())} ${now.getFullYear()}`;
   const balanceSign = balanceARS >= 0 ? '+' : '';
-  const balanceColor = balanceARS >= 0 ? 'text-[#30D158]' : 'text-[#FF453A]';
+  const balanceColor = balanceARS >= 0 ? 'text-[#F5E642]' : 'text-[#FF453A]';
 
   return (
     <div className="flex flex-col h-full safe-top">

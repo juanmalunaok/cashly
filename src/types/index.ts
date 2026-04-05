@@ -1,6 +1,9 @@
 export type Currency = 'ARS' | 'USD';
 export type TransactionType = 'income' | 'expense';
-export type AccountType = 'mercadopago' | 'galicia' | 'bbva' | 'efectivo';
+export type AccountType = 'mercadopago' | 'galicia' | 'bbva' | 'efectivo' | 'galicia_credito' | 'bbva_credito';
+
+export const DEBIT_ACCOUNTS: AccountType[] = ['galicia', 'bbva'];
+export const CREDIT_ACCOUNTS: AccountType[] = ['galicia_credito', 'bbva_credito'];
 
 export interface Transaction {
   id: string;
@@ -88,14 +91,18 @@ export const DEFAULT_CATEGORIES: Omit<Category, 'id'>[] = [
 
 export const ACCOUNT_LABELS: Record<AccountType, string> = {
   mercadopago: 'MercadoPago',
-  galicia: 'Galicia',
-  bbva: 'BBVA',
+  galicia: 'Galicia Débito',
+  bbva: 'BBVA Débito',
   efectivo: 'Efectivo',
+  galicia_credito: 'Galicia Crédito',
+  bbva_credito: 'BBVA Crédito',
 };
 
-export const ACCOUNT_OPTIONS: { value: AccountType; label: string }[] = [
-  { value: 'mercadopago', label: 'MercadoPago' },
-  { value: 'galicia', label: 'Galicia' },
-  { value: 'bbva', label: 'BBVA' },
-  { value: 'efectivo', label: 'Efectivo' },
+export const ACCOUNT_OPTIONS: { value: AccountType; label: string; group: 'debit' | 'credit' | 'cash' | 'digital' }[] = [
+  { value: 'galicia', label: 'Galicia Débito', group: 'debit' },
+  { value: 'bbva', label: 'BBVA Débito', group: 'debit' },
+  { value: 'galicia_credito', label: 'Galicia Crédito', group: 'credit' },
+  { value: 'bbva_credito', label: 'BBVA Crédito', group: 'credit' },
+  { value: 'mercadopago', label: 'MercadoPago', group: 'digital' },
+  { value: 'efectivo', label: 'Efectivo', group: 'cash' },
 ];

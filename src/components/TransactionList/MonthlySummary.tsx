@@ -46,7 +46,7 @@ export default function MonthlySummary({ transactions, rate }: MonthlySummaryPro
           label="Ingresos"
           amountARS={totals.incomeARS}
           amountUSD={totals.incomeUSD}
-          color="text-[#30D158]"
+          color="text-[#F5E642]"
         />
 
         {/* Expense */}
@@ -64,7 +64,7 @@ export default function MonthlySummary({ transactions, rate }: MonthlySummaryPro
           label="Balance"
           amountARS={Math.abs(balanceARS)}
           amountUSD={Math.abs(balanceUSD)}
-          color={isPositive ? 'text-[#30D158]' : 'text-[#FF453A]'}
+          color={isPositive ? 'text-[#F5E642]' : 'text-[#FF453A]'}
           prefix={isPositive ? '+' : '-'}
           bold
         />

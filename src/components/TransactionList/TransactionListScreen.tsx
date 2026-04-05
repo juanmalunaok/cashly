@@ -12,6 +12,7 @@ import MonthlySummary from './MonthlySummary';
 import FilterChips from './FilterChips';
 import DayGroup from './DayGroup';
 import MonthlyCategoryBreakdown from './MonthlyCategoryBreakdown';
+import CardSpendingSummary from './CardSpendingSummary';
 import EditTransactionSheet from './EditTransactionSheet';
 
 export default function TransactionListScreen() {
@@ -82,6 +83,11 @@ export default function TransactionListScreen() {
         <div className="mb-4">
           <MonthlySummary transactions={transactions} rate={rate} />
         </div>
+
+        {/* Card Spending Summary */}
+        {!loading && transactions.length > 0 && (
+          <CardSpendingSummary transactions={transactions} rate={rate} />
+        )}
 
         {/* Filter Chips */}
         <div className="mb-4">

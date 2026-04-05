@@ -30,7 +30,7 @@ export default function NumericKeypad({ onKey, display, currency }: NumericKeypa
   return (
     <div className="px-4">
       {/* Amount Display */}
-      <div className="text-center py-4 mb-2">
+      <div className="text-center py-5 mb-1">
         <span className="text-white/40 text-2xl font-light mr-1">
           {currency === 'ARS' ? '$' : 'USD'}
         </span>
@@ -40,7 +40,7 @@ export default function NumericKeypad({ onKey, display, currency }: NumericKeypa
       </div>
 
       {/* Keys */}
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-3 gap-2.5">
         {KEYS.flat().map((key) => (
           <KeyButton key={key} value={key} onPress={() => onKey(key)} />
         ))}
@@ -56,21 +56,14 @@ function KeyButton({ value, onPress }: { value: string; onPress: () => void }) {
   return (
     <button
       onClick={onPress}
-      className={cn(
-        'btn-glass h-[62px] rounded-[14px]',
-        'flex items-center justify-center',
-        'text-white font-medium',
-        isDelete ? 'text-white/60' : 'text-2xl',
-        'active:bg-white/15 transition-all duration-100',
-        'active:scale-95'
-      )}
+      className="key-btn"
     >
       {isDelete ? (
-        <Delete size={22} strokeWidth={1.5} className="text-white/70" />
+        <Delete size={22} strokeWidth={1.5} className="text-white/60" />
       ) : isDot ? (
-        <span className="text-3xl leading-none">.</span>
+        <span className="text-3xl font-bold leading-none text-white/70">.</span>
       ) : (
-        value
+        <span className={cn('text-white/90', 'text-[1.4rem] font-medium')}>{value}</span>
       )}
     </button>
   );

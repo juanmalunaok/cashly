@@ -103,7 +103,7 @@ export default function AmountSheet({ category, isOpen, onClose }: AmountSheetPr
           <span className="text-base font-semibold text-white/90">{category.name}</span>
           <span className={cn(
             'text-xs font-medium px-3 py-0.5 rounded-full',
-            isIncome ? 'text-[#30D158] bg-[#30D158]/15' : 'text-[#FF453A] bg-[#FF453A]/15'
+            isIncome ? 'text-[#F5E642] bg-[#F5E642]/15' : 'text-[#FF453A] bg-[#FF453A]/15'
           )}>
             {isIncome ? 'Ingreso' : 'Gasto'}
           </span>
@@ -158,7 +158,7 @@ export default function AmountSheet({ category, isOpen, onClose }: AmountSheetPr
             className={cn(
               confirmColor,
               'w-full py-4 rounded-[18px]',
-              'text-white text-lg font-semibold',
+              isIncome ? 'text-black text-lg font-semibold' : 'text-white text-lg font-semibold',
               'transition-all duration-200',
               (!hasAmount || saving) && 'opacity-40 pointer-events-none'
             )}
