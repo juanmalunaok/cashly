@@ -1,11 +1,11 @@
 'use client';
 
-import { Zap, List } from 'lucide-react';
+import { Zap, CreditCard, List } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface TabBarProps {
-  activeTab: 'quick' | 'list';
-  onTabChange: (tab: 'quick' | 'list') => void;
+  activeTab: 'quick' | 'cards' | 'list';
+  onTabChange: (tab: 'quick' | 'cards' | 'list') => void;
 }
 
 export default function TabBar({ activeTab, onTabChange }: TabBarProps) {
@@ -17,6 +17,12 @@ export default function TabBar({ activeTab, onTabChange }: TabBarProps) {
           label="Carga"
           active={activeTab === 'quick'}
           onClick={() => onTabChange('quick')}
+        />
+        <TabItem
+          icon={<CreditCard size={22} />}
+          label="Tarjetas"
+          active={activeTab === 'cards'}
+          onClick={() => onTabChange('cards')}
         />
         <TabItem
           icon={<List size={22} />}

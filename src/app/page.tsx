@@ -7,6 +7,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import QuickEntryScreen from '@/components/QuickEntry/QuickEntryScreen';
 import TransactionListScreen from '@/components/TransactionList/TransactionListScreen';
+import CardsScreen from '@/components/Cards/CardsScreen';
 import TabBar from '@/components/UI/TabBar';
 import { Suspense } from 'react';
 
@@ -14,7 +15,7 @@ function HomeContent() {
   const { user, loading } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [activeTab, setActiveTab] = useState<'quick' | 'list'>('quick');
+  const [activeTab, setActiveTab] = useState<'quick' | 'cards' | 'list'>('quick');
 
   useEffect(() => {
     if (!loading && !user) {
@@ -42,7 +43,9 @@ function HomeContent() {
   return (
     <div className="flex flex-col min-h-dvh">
       <div className="flex-1 overflow-hidden">
-        {activeTab === 'quick' ? <QuickEntryScreen /> : <TransactionListScreen />}
+        {activeTab === 'quick' && <QuickEntryScreen />}
+        {activeTab === 'cards' && <CardsScreen />}
+        {activeTab === 'list' && <TransactionListScreen />}
       </div>
       <TabBar activeTab={activeTab} onTabChange={setActiveTab} />
     </div>
