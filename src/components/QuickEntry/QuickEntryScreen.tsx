@@ -12,20 +12,6 @@ import { getMonthName } from '@/lib/utils';
 import CategoryGrid from './CategoryGrid';
 import AmountSheet from './AmountSheet';
 import SpendingPanel from './SpendingPanel';
-import { cn } from '@/lib/utils';
-
-function formatAmount2(amount: number, currency: 'ARS' | 'USD'): string {
-  if (currency === 'ARS') {
-    return '$' + new Intl.NumberFormat('es-AR', {
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(amount);
-  }
-  return 'USD ' + new Intl.NumberFormat('en-US', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(amount);
-}
 
 export default function QuickEntryScreen() {
   const router = useRouter();
@@ -38,33 +24,18 @@ export default function QuickEntryScreen() {
   const allUnpaidCredit = useAllUnpaidCredit();
   const { rate } = useDolarBlue();
 
-  // Calculate balance for header
-  const balanceARS = transactions.reduce((acc, t) => {
-    const amountInARS = t.currency === 'USD' && rate
-      ? t.amount * rate.venta
-      : t.amount;
-    return t.type === 'income' ? acc + amountInARS : acc - amountInARS;
-  }, 0);
-
   function handleCategorySelect(cat: Category) {
     setSelectedCategory(cat);
     setSheetOpen(true);
   }
 
   const monthLabel = `${getMonthName(now.getMonth())} ${now.getFullYear()}`;
-  const balanceSign = balanceARS >= 0 ? '+' : '';
-  const balanceColor = balanceARS >= 0 ? 'text-[#F5E642]' : 'text-[#FF453A]';
 
   return (
     <div className="flex flex-col h-full safe-top">
       {/* Header */}
       <div className="flex items-center justify-between px-5 pt-4 pb-3">
-        <div>
-          <p className="text-xs text-white/40 font-medium">{monthLabel}</p>
-          <p className={cn('text-xl font-bold tracking-tight mono', balanceColor)}>
-            {balanceSign}{formatAmount2(Math.abs(balanceARS), 'ARS')}
-          </p>
-        </div>
+        <p className="text-xs text-white/40 font-medium">{monthLabel}</p>
         <button
           onClick={() => router.push('/settings')}
           className="btn-glass w-10 h-10 rounded-full flex items-center justify-center"
