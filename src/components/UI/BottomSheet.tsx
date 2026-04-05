@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface BottomSheetProps {
@@ -45,9 +46,15 @@ export default function BottomSheet({ isOpen, onClose, children, title, classNam
           className
         )}
       >
-        {/* Handle */}
-        <div className="flex justify-center pt-3 pb-1">
+        {/* Handle + close button */}
+        <div className="relative flex justify-center items-center pt-3 pb-1">
           <div className="w-10 h-1 rounded-full bg-white/20" />
+          <button
+            onClick={onClose}
+            className="absolute right-4 w-7 h-7 rounded-full bg-white/[0.08] flex items-center justify-center active:scale-90 transition-transform"
+          >
+            <X size={15} className="text-white/50" />
+          </button>
         </div>
 
         {title && (
