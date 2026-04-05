@@ -6,6 +6,7 @@ import { Settings } from 'lucide-react';
 import { Category } from '@/types';
 import { useCategories } from '@/hooks/useCategories';
 import { useTransactions } from '@/hooks/useTransactions';
+import { useAllUnpaidCredit } from '@/hooks/useAllUnpaidCredit';
 import { useDolarBlue } from '@/hooks/useDolarBlue';
 import { getMonthName } from '@/lib/utils';
 import CategoryGrid from './CategoryGrid';
@@ -34,6 +35,7 @@ export default function QuickEntryScreen() {
   const now = new Date();
   const { categories, loading: catLoading } = useCategories();
   const { transactions } = useTransactions(now.getFullYear(), now.getMonth());
+  const allUnpaidCredit = useAllUnpaidCredit();
   const { rate } = useDolarBlue();
 
   // Calculate balance for header
@@ -81,7 +83,7 @@ export default function QuickEntryScreen() {
       )}
 
       {/* Spending Panel */}
-      <SpendingPanel transactions={transactions} rate={rate} />
+      <SpendingPanel transactions={transactions} allUnpaidCredit={allUnpaidCredit} rate={rate} />
 
       {/* Category Grid */}
       <div className="flex-1 overflow-y-auto scrollbar-hide pb-4">

@@ -149,6 +149,43 @@ export async function deleteCategory(uid: string, categoryId: string): Promise<v
   await deleteDoc(ref);
 }
 
+export function subscribeToAllUnpaidCredit(
+  uid: string,
+  callback: (transactions: Transaction[]) => void
+): () => void {
+  const q = query(
+    collection(db, 'users', uid, 'transactions'),
+    where('paid', '==', false),
+    where('type', '==', 'expense'),
+    orderBy('date', 'asc')
+  );
+
+  return onSnapshot(q, (snapshot) => {
+    const transactions: Transaction[] = snapshot.docs
+      .map((doc) => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          type: data.type,
+          amount: data.amount,
+          currency: data.currency,
+          category: data.category,
+          subcategory: data.subcategory,
+          account: data.account,
+          note: data.note,
+          installments: data.installments ?? null,
+          installmentNumber: data.installmentNumber ?? null,
+          paid: data.paid ?? false,
+          date: data.date?.toDate() ?? new Date(),
+          createdAt: data.createdAt?.toDate() ?? new Date(),
+          updatedAt: data.updatedAt?.toDate() ?? new Date(),
+        };
+      })
+      .filter((t) => ['galicia_credito', 'bbva_credito'].includes(t.account));
+    callback(transactions);
+  });
+}
+
 // ─── Export ────────────────────────────────────────────────────────────────────
 
 export async function exportTransactionsCSV(uid: string): Promise<string> {

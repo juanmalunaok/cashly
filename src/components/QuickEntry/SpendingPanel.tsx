@@ -11,10 +11,11 @@ function fmt(n: number): string {
 
 interface SpendingPanelProps {
   transactions: Transaction[];
+  allUnpaidCredit: Transaction[];
   rate: DolarBlueRate | null;
 }
 
-export default function SpendingPanel({ transactions, rate }: SpendingPanelProps) {
+export default function SpendingPanel({ transactions, allUnpaidCredit, rate }: SpendingPanelProps) {
   function toARS(t: Transaction): number {
     return t.currency === 'USD' && rate ? t.amount * rate.venta : t.amount;
   }
@@ -24,7 +25,6 @@ export default function SpendingPanel({ transactions, rate }: SpendingPanelProps
 
   // Crédito pagado = ya salió plata real
   const paidCredit = expenses.filter((t) => CREDIT_ACCOUNTS.includes(t.account) && t.paid);
-  const pendingCredit = expenses.filter((t) => CREDIT_ACCOUNTS.includes(t.account) && !t.paid);
 
   // Dinero real = efectivo/débito/mp + crédito ya pagado
   const todayReal = expenses
@@ -39,7 +39,9 @@ export default function SpendingPanel({ transactions, rate }: SpendingPanelProps
     ...paidCredit,
   ].reduce((sum, t) => sum + toARS(t), 0);
 
-  const monthPending = pendingCredit.reduce((sum, t) => sum + toARS(t), 0);
+  // Total deuda pendiente de tarjeta en todos los meses
+  const totalPending = allUnpaidCredit.reduce((sum, t) => sum + toARS(t), 0);
+  const pendingCount = allUnpaidCredit.length;
 
   return (
     <div className="px-4 mb-4">
@@ -53,7 +55,7 @@ export default function SpendingPanel({ transactions, rate }: SpendingPanelProps
       <div
         className={cn(
           'rounded-2xl px-4 py-3.5 border flex items-center justify-between',
-          monthPending > 0
+          totalPending > 0
             ? 'bg-[#FF453A]/10 border-[#FF453A]/20'
             : 'bg-[#1A1A1A] border-white/[0.05]'
         )}
@@ -63,13 +65,13 @@ export default function SpendingPanel({ transactions, rate }: SpendingPanelProps
             Crédito pendiente
           </p>
           <p className="text-[10px] text-white/25 mt-0.5">
-            {monthPending > 0
-              ? 'Marcá como pagado cuando cierre la tarjeta'
+            {totalPending > 0
+              ? `${pendingCount} cuota${pendingCount !== 1 ? 's' : ''} sin pagar — marcá al cerrar la tarjeta`
               : 'Sin deuda pendiente de tarjeta'}
           </p>
         </div>
-        <p className={cn('text-xl font-bold mono', monthPending > 0 ? 'text-[#FF453A]' : 'text-white/25')}>
-          {fmt(monthPending)}
+        <p className={cn('text-xl font-bold mono', totalPending > 0 ? 'text-[#FF453A]' : 'text-white/25')}>
+          {fmt(totalPending)}
         </p>
       </div>
     </div>
