@@ -22,40 +22,55 @@ function fmt(n: number, currency: 'ARS' | 'USD') {
 
 export default function TransactionItem({ transaction, category, onEdit }: TransactionItemProps) {
   const { user } = useAuth();
-  const [swiping, setSwiping] = useState(false); // animating off-screen
+  const [translateX, setTranslateX] = useState(0);
   const [showConfirm, setShowConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [toggling, setToggling] = useState(false);
   const touchStartX = useRef(0);
   const touchCurrentX = useRef(0);
-  const isSwiping = useRef(false);
+  const didSwipe = useRef(false);
 
   const isCredit = CREDIT_ACCOUNTS.includes(transaction.account);
   const isIncome = transaction.type === 'income';
   const amountColor = isIncome ? 'text-[#F5E642]' : 'text-[#FF453A]';
   const amountPrefix = isIncome ? '+' : '-';
 
+  function isTouchOnPaidBtn(e: React.TouchEvent) {
+    const target = e.target as HTMLElement;
+    return !!target.closest('[data-paid-btn]');
+  }
+
   function onTouchStart(e: React.TouchEvent) {
+    if (isTouchOnPaidBtn(e)) return;
+    didSwipe.current = false;
     touchStartX.current = e.touches[0].clientX;
     touchCurrentX.current = e.touches[0].clientX;
-    isSwiping.current = false;
+    setTranslateX(0);
   }
 
   function onTouchMove(e: React.TouchEvent) {
+    if (isTouchOnPaidBtn(e)) return;
     touchCurrentX.current = e.touches[0].clientX;
     const delta = touchStartX.current - touchCurrentX.current;
-    if (delta > 10) isSwiping.current = true;
+    if (delta > 0) {
+      setTranslateX(-Math.min(delta, 120));
+    }
   }
 
-  function onTouchEnd() {
+  function onTouchEnd(e: React.TouchEvent) {
+    if (isTouchOnPaidBtn(e)) return;
     const delta = touchStartX.current - touchCurrentX.current;
-    if (delta > 60) {
-      // Animate card off-screen then show confirm
-      setSwiping(true);
+    if (delta > 80) {
+      // Full swipe — animate off screen then show confirm
+      didSwipe.current = true;
+      setTranslateX(-window.innerWidth);
       setTimeout(() => {
-        setSwiping(false);
+        setTranslateX(0);
         setShowConfirm(true);
-      }, 180);
+      }, 220);
+    } else {
+      // Snap back
+      setTranslateX(0);
     }
   }
 
@@ -69,10 +84,6 @@ export default function TransactionItem({ transaction, category, onEdit }: Trans
       setDeleting(false);
       setShowConfirm(false);
     }
-  }
-
-  function handleCancelDelete() {
-    setShowConfirm(false);
   }
 
   async function handleTogglePaid(e: React.MouseEvent) {
@@ -92,8 +103,8 @@ export default function TransactionItem({ transaction, category, onEdit }: Trans
       {showConfirm && (
         <div
           className="fixed inset-0 z-50 flex items-end justify-center pb-8 px-4"
-          style={{ background: 'rgba(0,0,0,0.65)' }}
-          onClick={handleCancelDelete}
+          style={{ background: 'rgba(0,0,0,0.70)' }}
+          onClick={() => setShowConfirm(false)}
         >
           <div
             className="w-full max-w-sm rounded-3xl bg-[#1C1C1E] border border-white/[0.08] overflow-hidden"
@@ -115,16 +126,14 @@ export default function TransactionItem({ transaction, category, onEdit }: Trans
               </p>
             </div>
 
-            {/* Confirm message */}
             <div className="px-5 py-4 text-center">
               <p className="text-white/80 text-sm font-medium">¿Eliminar este movimiento?</p>
               <p className="text-white/35 text-xs mt-1">Esta acción no se puede deshacer</p>
             </div>
 
-            {/* Actions */}
             <div className="flex gap-2 px-4 pb-5">
               <button
-                onClick={handleCancelDelete}
+                onClick={() => setShowConfirm(false)}
                 className="flex-1 py-3.5 rounded-2xl bg-white/[0.07] border border-white/[0.08] text-white/70 text-sm font-semibold active:scale-95 transition-transform"
               >
                 Cancelar
@@ -148,16 +157,19 @@ export default function TransactionItem({ transaction, category, onEdit }: Trans
           'flex items-center gap-3 px-4 py-3',
           'rounded-2xl mx-4 mb-2 border border-white/[0.05]',
           isCredit && transaction.paid ? 'bg-[#1A1A1A]' : 'bg-[#191919]',
-          swiping
-            ? 'transition-transform duration-[180ms] ease-in -translate-x-full opacity-0'
-            : 'transition-none translate-x-0 opacity-100'
         )}
-        style={{ cursor: 'pointer' }}
+        style={{
+          transform: `translateX(${translateX}px)`,
+          transition: translateX === 0 || translateX === -window.innerWidth
+            ? 'transform 220ms ease-in'
+            : 'none',
+          cursor: 'pointer',
+        }}
         onTouchStart={onTouchStart}
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
         onClick={() => {
-          if (!isSwiping.current) onEdit(transaction);
+          if (!didSwipe.current) onEdit(transaction);
         }}
       >
         {/* Icon */}
@@ -197,11 +209,9 @@ export default function TransactionItem({ transaction, category, onEdit }: Trans
           {/* Paid toggle — solo tarjeta de crédito, solo gastos */}
           {isCredit && !isIncome && (
             <button
+              data-paid-btn="true"
               onClick={handleTogglePaid}
               disabled={toggling}
-              onTouchStart={(e) => e.stopPropagation()}
-              onTouchMove={(e) => e.stopPropagation()}
-              onTouchEnd={(e) => e.stopPropagation()}
               className={cn(
                 'flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold transition-all duration-200 active:scale-95',
                 transaction.paid

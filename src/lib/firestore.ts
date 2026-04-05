@@ -11,6 +11,7 @@ import {
   onSnapshot,
   Timestamp,
   serverTimestamp,
+  writeBatch,
 } from 'firebase/firestore';
 import { db } from './firebase';
 import { Transaction, Category, Currency, AccountType, TransactionType } from '@/types';
@@ -149,6 +150,21 @@ export async function deleteCategory(uid: string, categoryId: string): Promise<v
   await deleteDoc(ref);
 }
 
+export async function markAllAccountCreditPaid(uid: string, account: AccountType): Promise<void> {
+  const q = query(
+    collection(db, 'users', uid, 'transactions'),
+    where('account', '==', account),
+    where('paid', '==', false)
+  );
+  const snapshot = await getDocs(q);
+  if (snapshot.empty) return;
+  const batch = writeBatch(db);
+  snapshot.docs.forEach((d) => {
+    batch.update(d.ref, { paid: true, updatedAt: serverTimestamp() });
+  });
+  await batch.commit();
+}
+
 export function subscribeToAllUnpaidCredit(
   uid: string,
   callback: (transactions: Transaction[]) => void
@@ -181,7 +197,7 @@ export function subscribeToAllUnpaidCredit(
         };
       })
       // Filter in JS: only unpaid credit card expenses
-      .filter((t) => ['galicia_credito', 'bbva_credito'].includes(t.account) && t.type === 'expense');
+      .filter((t) => ['galicia_credito', 'bbva_credito', 'mercadopago_credito'].includes(t.account) && t.type === 'expense');
     callback(transactions);
   });
 }

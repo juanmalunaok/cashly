@@ -18,9 +18,16 @@ export default function AccountSelector({ value, onChange }: AccountSelectorProp
       <p className="text-[11px] text-white/35 font-semibold uppercase tracking-widest mb-2.5 ml-0.5">Cuenta</p>
 
       <div className="space-y-2">
-        {/* Débito + Crédito */}
+        {/* Débito */}
         <div className="grid grid-cols-2 gap-2">
-          {[...debit, ...credit].map((opt) => (
+          {debit.map((opt) => (
+            <AccountBtn key={opt.value} opt={opt} selected={value === opt.value} onChange={onChange} />
+          ))}
+        </div>
+
+        {/* Crédito (3 opciones) */}
+        <div className="grid grid-cols-3 gap-2">
+          {credit.map((opt) => (
             <AccountBtn key={opt.value} opt={opt} selected={value === opt.value} onChange={onChange} />
           ))}
         </div>
