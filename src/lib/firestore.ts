@@ -28,6 +28,7 @@ export interface CreateTransactionData {
   note?: string | null;
   installments?: number | null;
   installmentNumber?: number | null;
+  seriesId?: string | null;
   paid?: boolean;
   date?: Date;
 }
@@ -40,6 +41,7 @@ export async function createTransaction(uid: string, data: CreateTransactionData
     note: data.note ?? null,
     installments: data.installments ?? null,
     installmentNumber: data.installmentNumber ?? null,
+    seriesId: data.seriesId ?? null,
     paid: data.paid ?? false,
     date: data.date ? Timestamp.fromDate(data.date) : serverTimestamp(),
     createdAt: serverTimestamp(),
@@ -100,6 +102,7 @@ export function subscribeToMonthTransactions(
         note: data.note,
         installments: data.installments ?? null,
         installmentNumber: data.installmentNumber ?? null,
+        seriesId: data.seriesId ?? null,
         paid: data.paid ?? false,
         date: data.date?.toDate() ?? new Date(),
         createdAt: data.createdAt?.toDate() ?? new Date(),
@@ -108,6 +111,18 @@ export function subscribeToMonthTransactions(
     });
     callback(transactions);
   });
+}
+
+export async function deleteTransactionSeries(uid: string, seriesId: string): Promise<void> {
+  const q = query(
+    collection(db, 'users', uid, 'transactions'),
+    where('seriesId', '==', seriesId)
+  );
+  const snapshot = await getDocs(q);
+  if (snapshot.empty) return;
+  const batch = writeBatch(db);
+  snapshot.docs.forEach((d) => batch.delete(d.ref));
+  await batch.commit();
 }
 
 // ─── Categories ────────────────────────────────────────────────────────────────
@@ -190,6 +205,7 @@ export function subscribeToAllUnpaidCredit(
           note: data.note,
           installments: data.installments ?? null,
           installmentNumber: data.installmentNumber ?? null,
+          seriesId: data.seriesId ?? null,
           paid: data.paid ?? false,
           date: data.date?.toDate() ?? new Date(),
           createdAt: data.createdAt?.toDate() ?? new Date(),

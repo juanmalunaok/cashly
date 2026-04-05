@@ -3,7 +3,7 @@
 import { useState, useRef } from 'react';
 import { Check, Trash2 } from 'lucide-react';
 import { Transaction, Category, ACCOUNT_LABELS, CREDIT_ACCOUNTS } from '@/types';
-import { deleteTransaction, toggleCreditPaid } from '@/lib/firestore';
+import { deleteTransaction, deleteTransactionSeries, toggleCreditPaid } from '@/lib/firestore';
 import { useAuth } from '@/hooks/useAuth';
 import { cn } from '@/lib/utils';
 
@@ -74,11 +74,15 @@ export default function TransactionItem({ transaction, category, onEdit }: Trans
     }
   }
 
-  async function handleDelete() {
+  async function handleDelete(deleteSeries?: boolean) {
     if (!user) return;
     setDeleting(true);
     try {
-      await deleteTransaction(user.uid, transaction.id);
+      if (deleteSeries && transaction.seriesId) {
+        await deleteTransactionSeries(user.uid, transaction.seriesId);
+      } else {
+        await deleteTransaction(user.uid, transaction.id);
+      }
     } catch (err) {
       console.error(err);
       setDeleting(false);
@@ -138,14 +142,35 @@ export default function TransactionItem({ transaction, category, onEdit }: Trans
               >
                 Cancelar
               </button>
-              <button
-                onClick={handleDelete}
-                disabled={deleting}
-                className="flex-1 py-3.5 rounded-2xl bg-[#FF453A] text-white text-sm font-semibold flex items-center justify-center gap-2 active:scale-95 transition-transform disabled:opacity-60"
-              >
-                <Trash2 size={14} />
-                {deleting ? 'Eliminando...' : 'Eliminar'}
-              </button>
+              {transaction.seriesId ? (
+                <div className="flex-1 flex flex-col gap-2">
+                  <button
+                    onClick={() => handleDelete(false)}
+                    disabled={deleting}
+                    className="w-full py-2.5 rounded-2xl bg-white/[0.10] border border-white/[0.12] text-white/70 text-xs font-semibold flex items-center justify-center gap-1.5 active:scale-95 transition-transform disabled:opacity-60"
+                  >
+                    <Trash2 size={12} />
+                    {deleting ? '...' : 'Solo esta cuota'}
+                  </button>
+                  <button
+                    onClick={() => handleDelete(true)}
+                    disabled={deleting}
+                    className="w-full py-2.5 rounded-2xl bg-[#FF453A] text-white text-xs font-semibold flex items-center justify-center gap-1.5 active:scale-95 transition-transform disabled:opacity-60"
+                  >
+                    <Trash2 size={12} />
+                    {deleting ? 'Eliminando...' : `Todas (${transaction.installments} cuotas)`}
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={() => handleDelete(false)}
+                  disabled={deleting}
+                  className="flex-1 py-3.5 rounded-2xl bg-[#FF453A] text-white text-sm font-semibold flex items-center justify-center gap-2 active:scale-95 transition-transform disabled:opacity-60"
+                >
+                  <Trash2 size={14} />
+                  {deleting ? 'Eliminando...' : 'Eliminar'}
+                </button>
+              )}
             </div>
           </div>
         </div>

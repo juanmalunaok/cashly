@@ -71,6 +71,7 @@ export default function AmountSheet({ category, isOpen, onClose }: AmountSheetPr
       if (cuotas > 1) {
         // Create one transaction per installment, each dated 1 month apart
         const perCuota = Math.round((total / cuotas) * 100) / 100;
+        const seriesId = crypto.randomUUID();
         const now = new Date();
         for (let i = 0; i < cuotas; i++) {
           const date = new Date(now.getFullYear(), now.getMonth() + i, now.getDate());
@@ -84,6 +85,7 @@ export default function AmountSheet({ category, isOpen, onClose }: AmountSheetPr
             note: note.trim() || null,
             installments: cuotas,
             installmentNumber: i + 1,
+            seriesId,
             date,
           });
         }

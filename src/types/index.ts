@@ -16,6 +16,7 @@ export interface Transaction {
   note: string | null;
   installments: number | null; // null = no aplica, 1 = pago único, 2-12 = cuotas
   installmentNumber: number | null; // 1-based index of this installment (e.g. 2 of 3)
+  seriesId: string | null; // links all installments of the same purchase together
   paid: boolean; // solo relevante para crédito: si ya se pagó la tarjeta
   date: Date;
   createdAt: Date;
