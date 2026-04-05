@@ -128,7 +128,9 @@ export default function TransactionItem({ transaction, category, onEdit }: Trans
             </p>
             {transaction.installments && transaction.installments > 1 && (
               <span className="text-[9px] font-bold bg-[#FF453A]/20 text-[#FF453A] px-1.5 py-0.5 rounded-full">
-                {transaction.installments}x
+                {transaction.installmentNumber
+                  ? `${transaction.installmentNumber}/${transaction.installments}`
+                  : `${transaction.installments}x`}
               </span>
             )}
           </div>

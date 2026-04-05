@@ -65,17 +65,42 @@ export default function AmountSheet({ category, isOpen, onClose }: AmountSheetPr
     setSaving(true);
     try {
       const isCredit = CREDIT_ACCOUNTS.includes(account);
-      await createTransaction(user.uid, {
-        type: category.type,
-        amount: parseFloat(amount),
-        currency,
-        category: category.id,
-        subcategory: subcategory,
-        account,
-        note: note.trim() || null,
-        installments: isCredit ? installments : null,
-        date: new Date(),
-      });
+      const total = parseFloat(amount);
+      const cuotas = isCredit ? installments : 1;
+
+      if (cuotas > 1) {
+        // Create one transaction per installment, each dated 1 month apart
+        const perCuota = Math.round((total / cuotas) * 100) / 100;
+        const now = new Date();
+        for (let i = 0; i < cuotas; i++) {
+          const date = new Date(now.getFullYear(), now.getMonth() + i, now.getDate());
+          await createTransaction(user.uid, {
+            type: category.type,
+            amount: perCuota,
+            currency,
+            category: category.id,
+            subcategory: subcategory,
+            account,
+            note: note.trim() || null,
+            installments: cuotas,
+            installmentNumber: i + 1,
+            date,
+          });
+        }
+      } else {
+        await createTransaction(user.uid, {
+          type: category.type,
+          amount: total,
+          currency,
+          category: category.id,
+          subcategory: subcategory,
+          account,
+          note: note.trim() || null,
+          installments: isCredit ? 1 : null,
+          installmentNumber: null,
+          date: new Date(),
+        });
+      }
       setShowConfirm(true);
     } catch (err) {
       console.error(err);
@@ -141,7 +166,7 @@ export default function AmountSheet({ category, isOpen, onClose }: AmountSheetPr
         {/* Installments — solo tarjeta de crédito */}
         {CREDIT_ACCOUNTS.includes(account) && category?.type === 'expense' && (
           <div className="mt-4">
-            <InstallmentSelector value={installments} onChange={setInstallments} />
+            <InstallmentSelector value={installments} onChange={setInstallments} totalAmount={parseFloat(amount) || 0} />
           </div>
         )}
 
