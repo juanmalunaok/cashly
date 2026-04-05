@@ -56,7 +56,7 @@ export default function TransactionItem({ transaction, category, onEdit }: Trans
   }
 
   const isIncome = transaction.type === 'income';
-  const amountColor = isIncome ? 'text-[#30D158]' : 'text-[#FF453A]';
+  const amountColor = isIncome ? 'text-[#F5E642]' : 'text-[#FF453A]';
   const amountPrefix = isIncome ? '+' : '-';
 
   return (
@@ -112,9 +112,16 @@ export default function TransactionItem({ transaction, category, onEdit }: Trans
           <p className={cn('text-sm font-semibold mono', amountColor)}>
             {amountPrefix}{fmt(transaction.amount, transaction.currency)}
           </p>
-          <p className="text-[10px] text-white/30">
-            {ACCOUNT_LABELS[transaction.account]}
-          </p>
+          <div className="flex items-center justify-end gap-1.5 mt-0.5">
+            <p className="text-[10px] text-white/30">
+              {ACCOUNT_LABELS[transaction.account]}
+            </p>
+            {transaction.installments && transaction.installments > 1 && (
+              <span className="text-[9px] font-bold bg-[#FF453A]/20 text-[#FF453A] px-1.5 py-0.5 rounded-full">
+                {transaction.installments}x
+              </span>
+            )}
+          </div>
         </div>
       </div>
     </div>

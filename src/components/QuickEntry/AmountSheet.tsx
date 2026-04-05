@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-import { Category, Currency, AccountType } from '@/types';
+import { Category, Currency, AccountType, CREDIT_ACCOUNTS } from '@/types';
 import { createTransaction } from '@/lib/firestore';
 import { useAuth } from '@/hooks/useAuth';
 import BottomSheet from '@/components/UI/BottomSheet';
@@ -9,6 +9,7 @@ import NumericKeypad from './NumericKeypad';
 import CurrencyToggle from './CurrencyToggle';
 import AccountSelector from './AccountSelector';
 import SubcategorySelector from './SubcategorySelector';
+import InstallmentSelector from './InstallmentSelector';
 import ConfirmAnimation from '@/components/UI/ConfirmAnimation';
 import { cn } from '@/lib/utils';
 
@@ -25,6 +26,7 @@ export default function AmountSheet({ category, isOpen, onClose }: AmountSheetPr
   const [account, setAccount] = useState<AccountType>('efectivo');
   const [subcategory, setSubcategory] = useState<string | null>(null);
   const [note, setNote] = useState('');
+  const [installments, setInstallments] = useState(1);
   const [saving, setSaving] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
@@ -54,6 +56,7 @@ export default function AmountSheet({ category, isOpen, onClose }: AmountSheetPr
     setCurrency('ARS');
     setSubcategory(null);
     setNote('');
+    setInstallments(1);
     onClose();
   }
 
@@ -61,6 +64,7 @@ export default function AmountSheet({ category, isOpen, onClose }: AmountSheetPr
     if (!user || !category || parseFloat(amount) <= 0) return;
     setSaving(true);
     try {
+      const isCredit = CREDIT_ACCOUNTS.includes(account);
       await createTransaction(user.uid, {
         type: category.type,
         amount: parseFloat(amount),
@@ -69,6 +73,7 @@ export default function AmountSheet({ category, isOpen, onClose }: AmountSheetPr
         subcategory: subcategory,
         account,
         note: note.trim() || null,
+        installments: isCredit ? installments : null,
         date: new Date(),
       });
       setShowConfirm(true);
@@ -130,8 +135,15 @@ export default function AmountSheet({ category, isOpen, onClose }: AmountSheetPr
 
         {/* Account Selector */}
         <div className="mt-4">
-          <AccountSelector value={account} onChange={setAccount} />
+          <AccountSelector value={account} onChange={(a) => { setAccount(a); setInstallments(1); }} />
         </div>
+
+        {/* Installments — solo tarjeta de crédito */}
+        {CREDIT_ACCOUNTS.includes(account) && category?.type === 'expense' && (
+          <div className="mt-4">
+            <InstallmentSelector value={installments} onChange={setInstallments} />
+          </div>
+        )}
 
         {/* Note */}
         <div className="px-6 mt-4">

@@ -12,7 +12,8 @@ export const metadata: Metadata = {
     title: 'Cashly',
   },
   icons: {
-    apple: '/icons/icon-192.png',
+    apple: '/apple-touch-icon.png',
+    icon: '/icons/icon-192.png',
   },
 };
 
@@ -36,7 +37,8 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="apple-mobile-web-app-title" content="Cashly" />
-        <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        <link rel="icon" type="image/png" href="/icons/icon-192.png" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
       </head>
       <body>

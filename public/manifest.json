@@ -1,11 +1,11 @@
 {
   "name": "Cashly",
   "short_name": "Cashly",
-  "description": "Track your expenses and income effortlessly",
+  "description": "Control de gastos personal",
   "start_url": "/?mode=quick",
   "display": "standalone",
-  "background_color": "#0A0A0F",
-  "theme_color": "#0A0A0F",
+  "background_color": "#0D0D0D",
+  "theme_color": "#0D0D0D",
   "orientation": "portrait",
   "icons": [
     {

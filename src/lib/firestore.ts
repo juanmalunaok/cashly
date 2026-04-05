@@ -25,6 +25,7 @@ export interface CreateTransactionData {
   subcategory?: string | null;
   account: AccountType;
   note?: string | null;
+  installments?: number | null;
   date?: Date;
 }
 
@@ -34,6 +35,7 @@ export async function createTransaction(uid: string, data: CreateTransactionData
     ...data,
     subcategory: data.subcategory ?? null,
     note: data.note ?? null,
+    installments: data.installments ?? null,
     date: data.date ? Timestamp.fromDate(data.date) : serverTimestamp(),
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
@@ -86,6 +88,7 @@ export function subscribeToMonthTransactions(
         subcategory: data.subcategory,
         account: data.account,
         note: data.note,
+        installments: data.installments ?? null,
         date: data.date?.toDate() ?? new Date(),
         createdAt: data.createdAt?.toDate() ?? new Date(),
         updatedAt: data.updatedAt?.toDate() ?? new Date(),

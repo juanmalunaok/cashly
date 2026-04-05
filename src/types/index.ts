@@ -14,6 +14,7 @@ export interface Transaction {
   subcategory: string | null;
   account: AccountType;
   note: string | null;
+  installments: number | null; // null = no aplica, 1 = pago único, 2-12 = cuotas
   date: Date;
   createdAt: Date;
   updatedAt: Date;
