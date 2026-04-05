@@ -24,8 +24,9 @@ export default function LoginForm() {
         await signUpWithEmail(email, password, displayName);
       }
     } catch (err: unknown) {
+      const code = (err as { code?: string })?.code ?? '';
       const msg = err instanceof Error ? err.message : 'Error desconocido';
-      setError(friendlyError(msg));
+      setError(friendlyError(code || msg));
     } finally {
       setLoading(false);
     }
@@ -37,8 +38,9 @@ export default function LoginForm() {
     try {
       await signInWithGoogle();
     } catch (err: unknown) {
+      const code = (err as { code?: string })?.code ?? '';
       const msg = err instanceof Error ? err.message : 'Error desconocido';
-      setError(friendlyError(msg));
+      setError(friendlyError(code || msg));
     } finally {
       setLoading(false);
     }
@@ -190,8 +192,23 @@ function friendlyError(msg: string): string {
   if (msg.includes('weak-password')) {
     return 'La contraseña debe tener al menos 6 caracteres';
   }
-  if (msg.includes('popup-closed')) {
+  if (msg.includes('popup-closed') || msg.includes('cancelled-popup-request')) {
     return 'Se cerró la ventana de Google';
   }
-  return 'Ocurrió un error. Intentá de nuevo.';
+  if (msg.includes('popup-blocked')) {
+    return 'El navegador bloqueó el popup. Permití popups para este sitio.';
+  }
+  if (msg.includes('unauthorized-domain')) {
+    return 'Dominio no autorizado en Firebase. Agregá cashly-omega.vercel.app en Firebase Auth.';
+  }
+  if (msg.includes('operation-not-allowed')) {
+    return 'Este método de inicio de sesión no está habilitado en Firebase.';
+  }
+  if (msg.includes('network-request-failed')) {
+    return 'Error de red. Verificá tu conexión.';
+  }
+  if (msg.includes('too-many-requests')) {
+    return 'Demasiados intentos. Esperá unos minutos.';
+  }
+  return `Error: ${msg}`;
 }
