@@ -153,11 +153,10 @@ export function subscribeToAllUnpaidCredit(
   uid: string,
   callback: (transactions: Transaction[]) => void
 ): () => void {
+  // Single where clause only — avoids needing a composite Firestore index
   const q = query(
     collection(db, 'users', uid, 'transactions'),
-    where('paid', '==', false),
-    where('type', '==', 'expense'),
-    orderBy('date', 'asc')
+    where('paid', '==', false)
   );
 
   return onSnapshot(q, (snapshot) => {
@@ -181,7 +180,8 @@ export function subscribeToAllUnpaidCredit(
           updatedAt: data.updatedAt?.toDate() ?? new Date(),
         };
       })
-      .filter((t) => ['galicia_credito', 'bbva_credito'].includes(t.account));
+      // Filter in JS: only unpaid credit card expenses
+      .filter((t) => ['galicia_credito', 'bbva_credito'].includes(t.account) && t.type === 'expense');
     callback(transactions);
   });
 }
