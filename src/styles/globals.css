@@ -1,0 +1,231 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── Global Background ────────────────────────────────────────────────────── */
+:root {
+  --bg-primary: #0B1426;
+  --bg-gradient: radial-gradient(ellipse at 20% 20%, #2D1B69 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 80%, #0D4F4F 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 50%, #1A3A6B 0%, transparent 70%),
+    #0B1426;
+  --glass-bg: rgba(255, 255, 255, 0.06);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  --text-primary: rgba(255, 255, 255, 0.9);
+  --text-secondary: rgba(255, 255, 255, 0.5);
+  --text-tertiary: rgba(255, 255, 255, 0.3);
+  --separator: rgba(255, 255, 255, 0.06);
+  --ios-green: #30D158;
+  --ios-red: #FF453A;
+  --ios-blue: #0A84FF;
+  --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-area-inset-top: env(safe-area-inset-top, 0px);
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', system-ui, sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#__next,
+main {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+/* ─── Glassmorphism Utilities ──────────────────────────────────────────────── */
+@layer components {
+  .glass {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+  }
+
+  .glass-strong {
+    background: rgba(255, 255, 255, 0.10);
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  }
+
+  .glass-sheet {
+    background: rgba(18, 28, 50, 0.85);
+    backdrop-filter: blur(40px);
+    -webkit-backdrop-filter: blur(40px);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .btn-glass {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+    transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  .btn-glass:active {
+    transform: scale(0.95);
+    background: rgba(255, 255, 255, 0.10);
+  }
+
+  .btn-primary {
+    background: var(--ios-blue);
+    border: none;
+    box-shadow: 0 4px 16px rgba(10, 132, 255, 0.4);
+    transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    cursor: pointer;
+  }
+
+  .btn-primary:active {
+    transform: scale(0.97);
+    box-shadow: 0 2px 8px rgba(10, 132, 255, 0.3);
+  }
+
+  .btn-income {
+    background: var(--ios-green);
+    border: none;
+    box-shadow: 0 4px 16px rgba(48, 209, 88, 0.4);
+    transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    cursor: pointer;
+  }
+
+  .btn-income:active {
+    transform: scale(0.97);
+  }
+
+  .btn-expense {
+    background: var(--ios-red);
+    border: none;
+    box-shadow: 0 4px 16px rgba(255, 69, 58, 0.4);
+    transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    cursor: pointer;
+  }
+
+  .btn-expense:active {
+    transform: scale(0.97);
+  }
+}
+
+/* ─── Global Background Fixed ─────────────────────────────────────────────── */
+.mesh-bg {
+  position: fixed;
+  inset: 0;
+  background: var(--bg-gradient);
+  background-attachment: fixed;
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* ─── Typography ───────────────────────────────────────────────────────────── */
+.amount-display {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum';
+  letter-spacing: -0.02em;
+}
+
+/* ─── Scrollbar Hidden ─────────────────────────────────────────────────────── */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* ─── Safe Areas ───────────────────────────────────────────────────────────── */
+.safe-top {
+  padding-top: var(--safe-area-inset-top);
+}
+
+.safe-bottom {
+  padding-bottom: var(--safe-area-inset-bottom);
+}
+
+/* ─── Input Reset ──────────────────────────────────────────────────────────── */
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input {
+  background: transparent;
+  outline: none;
+  color: var(--text-primary);
+}
+
+input::placeholder {
+  color: var(--text-tertiary);
+}
+
+/* ─── Ripple Effect ────────────────────────────────────────────────────────── */
+.ripple {
+  position: relative;
+  overflow: hidden;
+}
+
+.ripple::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: inherit;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.ripple:active::after {
+  opacity: 1;
+}
+
+/* ─── Bottom Sheet Overlay ─────────────────────────────────────────────────── */
+.sheet-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 40;
+  animation: fadeIn 0.2s ease;
+}
+
+/* ─── Swipe Action ─────────────────────────────────────────────────────────── */
+.swipe-container {
+  overflow: hidden;
+  position: relative;
+}
+
+/* ─── Separator ────────────────────────────────────────────────────────────── */
+.separator {
+  height: 1px;
+  background: var(--separator);
+}
+
+/* ─── Monospace Amount ─────────────────────────────────────────────────────── */
+.mono {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum';
+}
