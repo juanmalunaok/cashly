@@ -29,6 +29,7 @@ export interface CreateTransactionData {
   installments?: number | null;
   installmentNumber?: number | null;
   seriesId?: string | null;
+  scheduled?: boolean;
   paid?: boolean;
   date?: Date;
 }
@@ -42,6 +43,7 @@ export async function createTransaction(uid: string, data: CreateTransactionData
     installments: data.installments ?? null,
     installmentNumber: data.installmentNumber ?? null,
     seriesId: data.seriesId ?? null,
+    scheduled: data.scheduled ?? false,
     paid: data.paid ?? false,
     date: data.date ? Timestamp.fromDate(data.date) : serverTimestamp(),
     createdAt: serverTimestamp(),
@@ -103,12 +105,55 @@ export function subscribeToMonthTransactions(
         installments: data.installments ?? null,
         installmentNumber: data.installmentNumber ?? null,
         seriesId: data.seriesId ?? null,
+        scheduled: data.scheduled ?? false,
         paid: data.paid ?? false,
         date: data.date?.toDate() ?? new Date(),
         createdAt: data.createdAt?.toDate() ?? new Date(),
         updatedAt: data.updatedAt?.toDate() ?? new Date(),
       };
     });
+    callback(transactions);
+  });
+}
+
+export function subscribeToScheduledTransactions(
+  uid: string,
+  callback: (transactions: Transaction[]) => void
+): () => void {
+  const q = query(
+    collection(db, 'users', uid, 'transactions'),
+    where('scheduled', '==', true)
+  );
+
+  return onSnapshot(q, (snapshot) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const transactions: Transaction[] = snapshot.docs
+      .map((doc) => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          type: data.type,
+          amount: data.amount,
+          currency: data.currency,
+          category: data.category,
+          subcategory: data.subcategory ?? null,
+          account: data.account,
+          note: data.note ?? null,
+          installments: data.installments ?? null,
+          installmentNumber: data.installmentNumber ?? null,
+          seriesId: data.seriesId ?? null,
+          scheduled: true,
+          paid: data.paid ?? false,
+          date: data.date?.toDate() ?? new Date(),
+          createdAt: data.createdAt?.toDate() ?? new Date(),
+          updatedAt: data.updatedAt?.toDate() ?? new Date(),
+        };
+      })
+      .filter((t) => t.date >= today)
+      .sort((a, b) => a.date.getTime() - b.date.getTime());
+
     callback(transactions);
   });
 }
@@ -206,6 +251,7 @@ export function subscribeToAllUnpaidCredit(
           installments: data.installments ?? null,
           installmentNumber: data.installmentNumber ?? null,
           seriesId: data.seriesId ?? null,
+          scheduled: data.scheduled ?? false,
           paid: data.paid ?? false,
           date: data.date?.toDate() ?? new Date(),
           createdAt: data.createdAt?.toDate() ?? new Date(),

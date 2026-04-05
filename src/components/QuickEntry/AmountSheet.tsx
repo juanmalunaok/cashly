@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
+import { CalendarDays } from 'lucide-react';
 import { Category, Currency, AccountType, CREDIT_ACCOUNTS } from '@/types';
 import { createTransaction } from '@/lib/firestore';
 import { useAuth } from '@/hooks/useAuth';
@@ -27,8 +28,19 @@ export default function AmountSheet({ category, isOpen, onClose }: AmountSheetPr
   const [subcategory, setSubcategory] = useState<string | null>(null);
   const [note, setNote] = useState('');
   const [installments, setInstallments] = useState(1);
+  const [selectedDate, setSelectedDate] = useState<string>(() => {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  });
   const [saving, setSaving] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+
+  const todayStr = useMemo(() => {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  }, []);
+
+  const isScheduled = selectedDate > todayStr;
 
   const handleKey = useCallback((key: string) => {
     setAmount((prev) => {
@@ -57,6 +69,7 @@ export default function AmountSheet({ category, isOpen, onClose }: AmountSheetPr
     setSubcategory(null);
     setNote('');
     setInstallments(1);
+    setSelectedDate(todayStr);
     onClose();
   }
 
@@ -68,13 +81,15 @@ export default function AmountSheet({ category, isOpen, onClose }: AmountSheetPr
       const total = parseFloat(amount);
       const cuotas = isCredit ? installments : 1;
 
+      // Parse selected date at noon local time to avoid timezone shifts
+      const baseDate = new Date(selectedDate + 'T12:00:00');
+
       if (cuotas > 1) {
         // Create one transaction per installment, each dated 1 month apart
         const perCuota = Math.round((total / cuotas) * 100) / 100;
         const seriesId = crypto.randomUUID();
-        const now = new Date();
         for (let i = 0; i < cuotas; i++) {
-          const date = new Date(now.getFullYear(), now.getMonth() + i, now.getDate());
+          const date = new Date(baseDate.getFullYear(), baseDate.getMonth() + i, baseDate.getDate(), 12, 0, 0);
           await createTransaction(user.uid, {
             type: category.type,
             amount: perCuota,
@@ -86,6 +101,7 @@ export default function AmountSheet({ category, isOpen, onClose }: AmountSheetPr
             installments: cuotas,
             installmentNumber: i + 1,
             seriesId,
+            scheduled: isScheduled,
             date,
           });
         }
@@ -100,7 +116,8 @@ export default function AmountSheet({ category, isOpen, onClose }: AmountSheetPr
           note: note.trim() || null,
           installments: isCredit ? 1 : null,
           installmentNumber: null,
-          date: new Date(),
+          scheduled: isScheduled,
+          date: baseDate,
         });
       }
       setShowConfirm(true);
@@ -171,6 +188,30 @@ export default function AmountSheet({ category, isOpen, onClose }: AmountSheetPr
             <InstallmentSelector value={installments} onChange={setInstallments} totalAmount={parseFloat(amount) || 0} />
           </div>
         )}
+
+        {/* Date picker */}
+        <div className="px-6 mt-4">
+          <label className={cn(
+            'flex items-center gap-3 px-4 py-3 rounded-xl border cursor-pointer',
+            isScheduled
+              ? 'bg-[#F5E642]/10 border-[#F5E642]/30'
+              : 'glass border-white/[0.08]'
+          )}>
+            <CalendarDays size={16} className={isScheduled ? 'text-[#F5E642]' : 'text-white/40'} />
+            <span className={cn('text-sm flex-1', isScheduled ? 'text-[#F5E642]' : 'text-white/50')}>
+              {isScheduled
+                ? `Programado para ${new Date(selectedDate + 'T12:00:00').toLocaleDateString('es-AR', { day: 'numeric', month: 'long' })}`
+                : 'Hoy'}
+            </span>
+            <input
+              type="date"
+              value={selectedDate}
+              min={todayStr}
+              onChange={(e) => setSelectedDate(e.target.value || todayStr)}
+              className="opacity-0 absolute w-0 h-0"
+            />
+          </label>
+        </div>
 
         {/* Note */}
         <div className="px-6 mt-4">

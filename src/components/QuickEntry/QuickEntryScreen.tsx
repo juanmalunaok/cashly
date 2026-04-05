@@ -7,11 +7,13 @@ import { Category } from '@/types';
 import { useCategories } from '@/hooks/useCategories';
 import { useTransactions } from '@/hooks/useTransactions';
 import { useAllUnpaidCredit } from '@/hooks/useAllUnpaidCredit';
+import { useScheduledTransactions } from '@/hooks/useScheduledTransactions';
 import { useDolarBlue } from '@/hooks/useDolarBlue';
 import { getMonthName } from '@/lib/utils';
 import CategoryGrid from './CategoryGrid';
 import AmountSheet from './AmountSheet';
 import SpendingPanel from './SpendingPanel';
+import UpcomingPanel from './UpcomingPanel';
 
 export default function QuickEntryScreen() {
   const router = useRouter();
@@ -22,6 +24,7 @@ export default function QuickEntryScreen() {
   const { categories, loading: catLoading } = useCategories();
   const { transactions } = useTransactions(now.getFullYear(), now.getMonth());
   const allUnpaidCredit = useAllUnpaidCredit();
+  const scheduled = useScheduledTransactions();
   const { rate } = useDolarBlue();
 
   function handleCategorySelect(cat: Category) {
@@ -55,6 +58,9 @@ export default function QuickEntryScreen() {
 
       {/* Spending Panel */}
       <SpendingPanel transactions={transactions} allUnpaidCredit={allUnpaidCredit} rate={rate} />
+
+      {/* Upcoming scheduled transactions */}
+      <UpcomingPanel scheduled={scheduled} categories={categories} />
 
       {/* Category Grid */}
       <div className="flex-1 overflow-y-auto scrollbar-hide pb-4">

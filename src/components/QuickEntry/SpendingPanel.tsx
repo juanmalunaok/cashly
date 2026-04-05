@@ -28,9 +28,14 @@ export default function SpendingPanel({ transactions, allUnpaidCredit, rate }: S
     return t.currency === 'USD' && rate ? t.amount * rate.venta : t.amount;
   }
 
+  const todayStart = new Date();
+  todayStart.setHours(0, 0, 0, 0);
+  // Exclude scheduled transactions that haven't arrived yet
+  const active = transactions.filter((t) => !t.scheduled || t.date <= todayStart);
+
   const today = new Date().toDateString();
-  const income = transactions.filter((t) => t.type === 'income');
-  const expenses = transactions.filter((t) => t.type === 'expense');
+  const income = active.filter((t) => t.type === 'income');
+  const expenses = active.filter((t) => t.type === 'expense');
   const paidCredit = expenses.filter((t) => CREDIT_ACCOUNTS.includes(t.account) && t.paid);
 
   // Ingresos
