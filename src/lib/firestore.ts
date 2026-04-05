@@ -26,6 +26,7 @@ export interface CreateTransactionData {
   account: AccountType;
   note?: string | null;
   installments?: number | null;
+  paid?: boolean;
   date?: Date;
 }
 
@@ -36,6 +37,7 @@ export async function createTransaction(uid: string, data: CreateTransactionData
     subcategory: data.subcategory ?? null,
     note: data.note ?? null,
     installments: data.installments ?? null,
+    paid: data.paid ?? false,
     date: data.date ? Timestamp.fromDate(data.date) : serverTimestamp(),
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
@@ -58,6 +60,11 @@ export async function updateTransaction(
 export async function deleteTransaction(uid: string, transactionId: string): Promise<void> {
   const ref = doc(db, 'users', uid, 'transactions', transactionId);
   await deleteDoc(ref);
+}
+
+export async function toggleCreditPaid(uid: string, transactionId: string, paid: boolean): Promise<void> {
+  const ref = doc(db, 'users', uid, 'transactions', transactionId);
+  await updateDoc(ref, { paid, updatedAt: serverTimestamp() });
 }
 
 export function subscribeToMonthTransactions(
@@ -89,6 +96,7 @@ export function subscribeToMonthTransactions(
         account: data.account,
         note: data.note,
         installments: data.installments ?? null,
+        paid: data.paid ?? false,
         date: data.date?.toDate() ?? new Date(),
         createdAt: data.createdAt?.toDate() ?? new Date(),
         updatedAt: data.updatedAt?.toDate() ?? new Date(),

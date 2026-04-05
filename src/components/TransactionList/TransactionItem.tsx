@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { Trash2 } from 'lucide-react';
-import { Transaction, Category, ACCOUNT_LABELS } from '@/types';
-import { deleteTransaction } from '@/lib/firestore';
+import { Trash2, Check } from 'lucide-react';
+import { Transaction, Category, ACCOUNT_LABELS, CREDIT_ACCOUNTS } from '@/types';
+import { deleteTransaction, toggleCreditPaid } from '@/lib/firestore';
 import { useAuth } from '@/hooks/useAuth';
 import { cn } from '@/lib/utils';
 
@@ -24,8 +24,11 @@ export default function TransactionItem({ transaction, category, onEdit }: Trans
   const { user } = useAuth();
   const [swiped, setSwiped] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [toggling, setToggling] = useState(false);
   const touchStartX = useRef(0);
   const touchCurrentX = useRef(0);
+
+  const isCredit = CREDIT_ACCOUNTS.includes(transaction.account);
 
   function onTouchStart(e: React.TouchEvent) {
     touchStartX.current = e.touches[0].clientX;
@@ -37,11 +40,8 @@ export default function TransactionItem({ transaction, category, onEdit }: Trans
 
   function onTouchEnd() {
     const delta = touchStartX.current - touchCurrentX.current;
-    if (delta > 60) {
-      setSwiped(true);
-    } else if (delta < -20) {
-      setSwiped(false);
-    }
+    if (delta > 60) setSwiped(true);
+    else if (delta < -20) setSwiped(false);
   }
 
   async function handleDelete() {
@@ -52,6 +52,17 @@ export default function TransactionItem({ transaction, category, onEdit }: Trans
     } catch (err) {
       console.error(err);
       setDeleting(false);
+    }
+  }
+
+  async function handleTogglePaid(e: React.MouseEvent) {
+    e.stopPropagation();
+    if (!user || toggling) return;
+    setToggling(true);
+    try {
+      await toggleCreditPaid(user.uid, transaction.id, !transaction.paid);
+    } finally {
+      setToggling(false);
     }
   }
 
@@ -76,7 +87,8 @@ export default function TransactionItem({ transaction, category, onEdit }: Trans
       <div
         className={cn(
           'relative z-10 flex items-center gap-3 px-4 py-3',
-          'glass rounded-2xl mx-4 mb-2',
+          'rounded-2xl mx-4 mb-2 border border-white/[0.05]',
+          isCredit && transaction.paid ? 'bg-[#1A1A1A]' : 'bg-[#191919]',
           'transition-transform duration-200',
           swiped ? '-translate-x-16' : 'translate-x-0'
         )}
@@ -85,15 +97,12 @@ export default function TransactionItem({ transaction, category, onEdit }: Trans
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
         onClick={() => {
-          if (swiped) {
-            setSwiped(false);
-          } else {
-            onEdit(transaction);
-          }
+          if (swiped) setSwiped(false);
+          else onEdit(transaction);
         }}
       >
         {/* Icon */}
-        <div className="w-11 h-11 rounded-xl bg-white/08 flex items-center justify-center flex-shrink-0 text-xl">
+        <div className="w-11 h-11 rounded-xl bg-white/[0.06] flex items-center justify-center flex-shrink-0 text-xl">
           {category?.icon ?? '❓'}
         </div>
 
@@ -107,12 +116,13 @@ export default function TransactionItem({ transaction, category, onEdit }: Trans
           )}
         </div>
 
-        {/* Amount */}
-        <div className="text-right flex-shrink-0">
+        {/* Amount + badges */}
+        <div className="flex flex-col items-end gap-1 flex-shrink-0">
           <p className={cn('text-sm font-semibold mono', amountColor)}>
             {amountPrefix}{fmt(transaction.amount, transaction.currency)}
           </p>
-          <div className="flex items-center justify-end gap-1.5 mt-0.5">
+
+          <div className="flex items-center gap-1.5">
             <p className="text-[10px] text-white/30">
               {ACCOUNT_LABELS[transaction.account]}
             </p>
@@ -122,6 +132,23 @@ export default function TransactionItem({ transaction, category, onEdit }: Trans
               </span>
             )}
           </div>
+
+          {/* Paid toggle — solo tarjeta de crédito, solo gastos */}
+          {isCredit && !isIncome && (
+            <button
+              onClick={handleTogglePaid}
+              disabled={toggling}
+              className={cn(
+                'flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold transition-all duration-200 active:scale-95',
+                transaction.paid
+                  ? 'bg-[#F5E642]/20 text-[#F5E642] border border-[#F5E642]/30'
+                  : 'bg-white/[0.07] text-white/35 border border-white/10'
+              )}
+            >
+              {transaction.paid && <Check size={9} strokeWidth={3} />}
+              {transaction.paid ? 'Pagado' : 'Pendiente'}
+            </button>
+          )}
         </div>
       </div>
     </div>

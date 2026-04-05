@@ -15,6 +15,7 @@ export interface Transaction {
   account: AccountType;
   note: string | null;
   installments: number | null; // null = no aplica, 1 = pago único, 2-12 = cuotas
+  paid: boolean; // solo relevante para crédito: si ya se pagó la tarjeta
   date: Date;
   createdAt: Date;
   updatedAt: Date;
