@@ -29,8 +29,16 @@ export default function SpendingPanel({ transactions, allUnpaidCredit, rate }: S
   }
 
   const today = new Date().toDateString();
+  const income = transactions.filter((t) => t.type === 'income');
   const expenses = transactions.filter((t) => t.type === 'expense');
   const paidCredit = expenses.filter((t) => CREDIT_ACCOUNTS.includes(t.account) && t.paid);
+
+  // Ingresos
+  const todayIncome = income
+    .filter((t) => t.date.toDateString() === today)
+    .reduce((sum, t) => sum + toARS(t), 0);
+
+  const monthIncome = income.reduce((sum, t) => sum + toARS(t), 0);
 
   // Dinero real = efectivo/débito/mp + crédito ya pagado
   const todayReal = expenses
@@ -73,10 +81,16 @@ export default function SpendingPanel({ transactions, allUnpaidCredit, rate }: S
 
   return (
     <div className="px-4 mb-4 space-y-2.5">
-      {/* Top row: Hoy + Este mes real */}
+      {/* Ingresos */}
       <div className="flex gap-2.5">
-        <StatCard label="Hoy" sublabel="dinero real" value={fmt(todayReal)} />
-        <StatCard label="Este mes" sublabel="dinero real" value={fmt(monthReal)} />
+        <StatCard label="Hoy" sublabel="ingresos" value={fmt(todayIncome)} accent="income" />
+        <StatCard label="Este mes" sublabel="ingresos" value={fmt(monthIncome)} accent="income" />
+      </div>
+
+      {/* Gastos reales */}
+      <div className="flex gap-2.5">
+        <StatCard label="Hoy" sublabel="gastos reales" value={fmt(todayReal)} />
+        <StatCard label="Este mes" sublabel="gastos reales" value={fmt(monthReal)} />
       </div>
 
       {/* Este mes en crédito */}
@@ -158,11 +172,26 @@ export default function SpendingPanel({ transactions, allUnpaidCredit, rate }: S
   );
 }
 
-function StatCard({ label, sublabel, value }: { label: string; sublabel: string; value: string }) {
+function StatCard({
+  label,
+  sublabel,
+  value,
+  accent,
+}: {
+  label: string;
+  sublabel: string;
+  value: string;
+  accent?: 'income';
+}) {
   return (
-    <div className="flex-1 rounded-2xl px-4 py-3.5 bg-[#1A1A1A] border border-white/[0.05]">
+    <div className={cn(
+      'flex-1 rounded-2xl px-4 py-3.5 border',
+      accent === 'income'
+        ? 'bg-[#F5E642]/[0.06] border-[#F5E642]/15'
+        : 'bg-[#1A1A1A] border-white/[0.05]'
+    )}>
       <p className="text-[11px] text-white/40 font-semibold uppercase tracking-widest mb-1">{label}</p>
-      <p className="text-xl font-bold mono text-white">{value}</p>
+      <p className={cn('text-xl font-bold mono', accent === 'income' ? 'text-[#F5E642]' : 'text-white')}>{value}</p>
       <p className="text-[10px] text-white/25 mt-0.5">{sublabel}</p>
     </div>
   );
