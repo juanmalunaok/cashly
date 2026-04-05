@@ -10,6 +10,7 @@ import { useDolarBlue } from '@/hooks/useDolarBlue';
 import { getMonthName } from '@/lib/utils';
 import CategoryGrid from './CategoryGrid';
 import AmountSheet from './AmountSheet';
+import SpendingPanel from './SpendingPanel';
 import { cn } from '@/lib/utils';
 
 function formatAmount2(amount: number, currency: 'ARS' | 'USD'): string {
@@ -78,6 +79,9 @@ export default function QuickEntryScreen() {
           </span>
         </div>
       )}
+
+      {/* Spending Panel */}
+      <SpendingPanel transactions={transactions} rate={rate} />
 
       {/* Category Grid */}
       <div className="flex-1 overflow-y-auto scrollbar-hide pb-4">
