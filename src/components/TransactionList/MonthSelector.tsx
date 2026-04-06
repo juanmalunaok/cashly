@@ -19,17 +19,12 @@ export default function MonthSelector({ year, month, onChange }: MonthSelectorPr
   }
 
   function next() {
-    const now = new Date();
-    if (year > now.getFullYear() || (year === now.getFullYear() && month >= now.getMonth())) return;
     if (month === 11) {
       onChange(year + 1, 0);
     } else {
       onChange(year, month + 1);
     }
   }
-
-  const now = new Date();
-  const isCurrentOrFuture = year > now.getFullYear() || (year === now.getFullYear() && month >= now.getMonth());
 
   return (
     <div className="flex items-center justify-between px-4 py-3">
@@ -46,8 +41,7 @@ export default function MonthSelector({ year, month, onChange }: MonthSelectorPr
 
       <button
         onClick={next}
-        disabled={isCurrentOrFuture}
-        className="btn-glass w-10 h-10 rounded-full flex items-center justify-center disabled:opacity-30"
+        className="btn-glass w-10 h-10 rounded-full flex items-center justify-center"
       >
         <ChevronRight size={20} className="text-white/70" />
       </button>
