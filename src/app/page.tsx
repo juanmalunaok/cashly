@@ -41,7 +41,7 @@ function HomeContent() {
   if (!user) return null;
 
   return (
-    <div className="flex flex-col min-h-dvh">
+    <div className="flex flex-col h-dvh">
       <div className="flex-1 overflow-hidden">
         {activeTab === 'quick' && <QuickEntryScreen />}
         {activeTab === 'cards' && <CardsScreen />}
