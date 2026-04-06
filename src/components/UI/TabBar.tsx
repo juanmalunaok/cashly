@@ -10,7 +10,7 @@ interface TabBarProps {
 
 export default function TabBar({ activeTab, onTabChange }: TabBarProps) {
   return (
-    <div className="glass-sheet border-t border-white/[0.06] safe-bottom flex-shrink-0">
+    <div className="glass-sheet border-t border-white/[0.06] flex-shrink-0">
       <div className="flex items-center justify-around px-6 pt-2 pb-2">
         <TabItem
           icon={<Zap size={22} />}
