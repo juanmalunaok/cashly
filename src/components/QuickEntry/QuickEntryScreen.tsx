@@ -35,7 +35,7 @@ export default function QuickEntryScreen() {
   const monthLabel = `${getMonthName(now.getMonth())} ${now.getFullYear()}`;
 
   return (
-    <div className="flex flex-col h-full safe-top">
+    <div className="safe-top">
       {/* Header */}
       <div className="flex items-center justify-between px-5 pt-4 pb-3">
         <p className="text-xs text-white/40 font-medium">{monthLabel}</p>
@@ -63,7 +63,7 @@ export default function QuickEntryScreen() {
       <UpcomingPanel scheduled={scheduled} categories={categories} />
 
       {/* Category Grid */}
-      <div className="flex-1 overflow-y-auto scrollbar-hide pb-4">
+      <div className="pb-4">
         {catLoading ? (
           <div className="flex items-center justify-center h-40">
             <div className="w-6 h-6 rounded-full border-2 border-white/20 border-t-white/60 animate-spin" />

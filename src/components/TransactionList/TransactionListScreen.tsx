@@ -55,7 +55,7 @@ export default function TransactionListScreen() {
   const editingCategory = editingTransaction ? catMap.get(editingTransaction.category) : undefined;
 
   return (
-    <div className="flex flex-col h-full safe-top">
+    <div className="safe-top">
       {/* Header */}
       <div className="flex items-center justify-between px-5 pt-4 pb-2">
         <h1 className="text-xl font-bold text-white/90">Listado</h1>
@@ -77,8 +77,8 @@ export default function TransactionListScreen() {
         }}
       />
 
-      {/* Scrollable content */}
-      <div className="flex-1 overflow-y-auto scrollbar-hide pb-4">
+      {/* Content */}
+      <div className="pb-4">
         {/* Summary Card */}
         <div className="mb-4">
           <MonthlySummary transactions={transactions} rate={rate} />

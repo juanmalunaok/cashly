@@ -66,7 +66,7 @@ export default function CardsScreen() {
   }).filter((c) => c.total > 0);
 
   return (
-    <div className="flex flex-col h-full safe-top">
+    <div className="safe-top">
       {/* Header */}
       <div className="px-5 pt-4 pb-2">
         <h1 className="text-xl font-bold text-white/90">Tarjetas</h1>
@@ -84,7 +84,7 @@ export default function CardsScreen() {
       />
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto scrollbar-hide pb-4">
+      <div className="pb-4">
         {loading ? (
           <div className="flex items-center justify-center h-32">
             <RefreshCw size={24} className="text-white/30 animate-spin" />

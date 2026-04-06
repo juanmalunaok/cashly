@@ -29,20 +29,18 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-html {
+html,
+body {
   height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
 }
 
 body {
-  padding: 0;
-  margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', system-ui, sans-serif;
   background: var(--bg-primary);
   color: var(--text-primary);
-  position: fixed;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }

@@ -42,7 +42,7 @@ function HomeContent() {
 
   return (
     <div className="flex flex-col h-dvh">
-      <div className="flex-1 min-h-0">
+      <div className="flex-1 min-h-0 overflow-y-auto scrollbar-hide">
         {activeTab === 'quick' && <QuickEntryScreen />}
         {activeTab === 'cards' && <CardsScreen />}
         {activeTab === 'list' && <TransactionListScreen />}
