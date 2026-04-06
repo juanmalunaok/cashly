@@ -29,7 +29,11 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-html,
+html {
+  height: 100%;
+  overflow: hidden;
+}
+
 body {
   padding: 0;
   margin: 0;
@@ -37,7 +41,7 @@ body {
   background: var(--bg-primary);
   color: var(--text-primary);
   height: 100%;
-  overflow: hidden;
+  overflow-y: auto;
   overscroll-behavior: none;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -46,7 +50,6 @@ body {
 #__next,
 main {
   height: 100%;
-  overflow: hidden;
 }
 
 /* ─── Card / Glass Utilities ────────────────────────────────────────────────── */
