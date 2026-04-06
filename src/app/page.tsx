@@ -42,7 +42,7 @@ function HomeContent() {
 
   return (
     <div className="flex flex-col h-dvh overflow-hidden">
-      <div className="flex-1 min-h-0 overflow-hidden">
+      <div className="flex-1 min-h-0 overflow-x-hidden">
         {activeTab === 'quick' && <QuickEntryScreen />}
         {activeTab === 'cards' && <CardsScreen />}
         {activeTab === 'list' && <TransactionListScreen />}
