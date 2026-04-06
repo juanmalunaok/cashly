@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -13,27 +14,18 @@ interface BottomSheetProps {
 }
 
 export default function BottomSheet({ isOpen, onClose, children, title, className }: BottomSheetProps) {
-  // Prevent body scroll when open
+  const [mounted, setMounted] = useState(false);
+
   useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [isOpen]);
+    setMounted(true);
+  }, []);
 
-  if (!isOpen) return null;
+  if (!isOpen || !mounted) return null;
 
-  return (
+  return createPortal(
     <>
       {/* Overlay */}
-      <div
-        className="sheet-overlay"
-        onClick={onClose}
-      />
+      <div className="sheet-overlay" onClick={onClose} />
 
       {/* Sheet */}
       <div
@@ -65,6 +57,7 @@ export default function BottomSheet({ isOpen, onClose, children, title, classNam
 
         <div className="pb-6">{children}</div>
       </div>
-    </>
+    </>,
+    document.body
   );
 }
